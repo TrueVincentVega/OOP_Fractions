@@ -94,10 +94,11 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		this->integer = other.integer;
 		this->numerator = other.numerator;
 		this->denominator = other.denominator;
-		cout << "CopyAssigment:\t" << this << endl;
+		cout << "CopyAssignment:" << this << endl;
 		return *this;
 	}
-	Fraction operator* (Fraction& right) const
+
+	/*Fraction operator*(Fraction right) const
 	{
 		Fraction left = *this;
 		left.to_improper();
@@ -107,32 +108,70 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		result.denominator = left.denominator * right.denominator;
 		result.to_proper();
 		return result;
-	}
+	}*/
+
 
 	//		Methods:
-	void print() const
+	void print()const
 	{
-		if (integer) cout << integer;
+		if (integer)cout << integer;
 		if (numerator)
 		{
-			if (integer) cout << "(";
+			if (integer)cout << "(";
 			cout << numerator << "/" << denominator;
-			if (integer) cout << ")";
+			if (integer)cout << ")";
 		}
-		else if (integer == 0) cout << 0;
+		else if (integer == 0)cout << 0;
 		cout << endl;
 	}
-	void to_improper()
+
+	Fraction& to_improper()
 	{
 		numerator += integer * denominator;
 		integer -= integer;
+		return *this;
 	}
-	void to_proper()
+	Fraction& to_proper()
 	{
 		integer += numerator / denominator;
 		numerator %= denominator;
+		return *this;
 	}
 };
+Fraction operator*(Fraction left, Fraction right) // оператор умножени€
+{
+	left.to_improper();
+	right.to_improper();
+	Fraction result(left.get_numerator() * right.get_numerator(), left.get_denominator() * right.get_denominator());
+	/*result.set_numerator(left.get_numerator()*right.get_numerator());
+	result.set_denominator(left.get_denominator()*right.get_denominator());*/
+	//result.to_proper();
+	return result.to_proper();
+}
+Fraction operator+(Fraction left, Fraction right) //оператор сложени€
+{
+	left.to_improper();
+	right.to_improper();
+	Fraction result((left.get_numerator() * right.get_denominator())+(right.get_numerator() * left.get_denominator()), left.get_denominator() * right.get_denominator());
+	return result.to_proper();
+}
+
+Fraction operator/(Fraction left, Fraction right) //оператор делени€
+{
+	left.to_improper();
+	right.to_improper();
+	Fraction result(left.get_numerator() * right.get_denominator(), left.get_denominator() * right.get_numerator());
+	return result.to_proper();
+}
+
+Fraction operator-(Fraction left, Fraction right) //оператор вычетани€
+{
+	left.to_improper();
+	right.to_improper();
+	Fraction result((left.get_numerator() * right.get_denominator()) - (right.get_numerator() * left.get_denominator()), left.get_denominator() * right.get_denominator());
+	return result.to_proper();
+}
+
 
 void main()
 {
@@ -168,11 +207,21 @@ void main()
 	A.print();
 	B.print();
 	Fraction C = A * B;
+	Fraction D = A + B;
+	Fraction E = A / B;
+	Fraction F = A - B;
+	C.print();
+	D.print();
+	E.print();
+	F.print();
+	cout << "---------------------" << endl;
 	C.print();
 	A.print();
 	B.print();
 
-
+	double a = 2.5;
+	double b = 3.14;
+	double c = a * b;
 #endif
 
 
