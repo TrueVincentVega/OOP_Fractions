@@ -137,6 +137,28 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		numerator %= denominator;
 		return *this;
 	}
+
+	bool reduce() // метод reduce сокращает дробь
+	{
+		int a, b;
+		a = this->numerator;
+		b = this->denominator;
+		bool res = false;
+		for (int i = this->denominator; i > 1; i--)
+		{
+			if ((this->numerator % i == 0) && (this->denominator % i == 0))
+			{
+				a /= i;
+				b /= i;
+				this->numerator /= i;
+				this->denominator /= i;
+				i = this->denominator;
+				res = true;
+			}
+		}
+		return(res);
+	}
+	
 };
 Fraction operator*(Fraction left, Fraction right) // оператор умножени€
 {
@@ -215,7 +237,7 @@ void main()
 	E.print();
 	F.print();
 	cout << "---------------------" << endl;
-	C.print();
+	C.reduce();
 	A.print();
 	B.print();
 
