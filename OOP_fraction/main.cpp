@@ -1,7 +1,12 @@
 #include<iostream>
-using namespace std;
+using std::cout;
+using std::endl;
+using std::cin;
+
 //#define CONSTRUCTIONS_CHECK
-#define OPERATORS_CHECK
+//#define OPERATORS_CHECK
+//#define INPUT_OUTPUT_CHECK
+#define TYPE_CONVERSIONS
 
 class Fraction
 {
@@ -43,27 +48,35 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		}
 	}
 
+	Fraction& operator()(int integer, int numerator, int denominator)
+	{
+		set_integer(integer);
+		set_numerator(numerator);
+		set_denominator(denominator);
+		return *this;
+	}
+
 	//		Constructors
 	Fraction()
 	{
 		this->integer = 0;
 		this->numerator = 0;
 		this->denominator = 1;
-		cout << "DefaultConstruct:\t" << this << endl;
+		std::cout << "DefaultConstruct:\t" << this << std::endl;
 	}
-	Fraction(int integer)
+	explicit Fraction(int integer) // €вный
 	{
 		this->integer = integer;
 		this->numerator = 0;
 		this->denominator = 1;
-		cout << "SingleArgumentConstructor:\t" << this << endl;
+		std::cout << "SingleArgumentConstructor:\t" << this << std::endl;
 	}
 	Fraction(int numerator, int denominator)
 	{
 		this->integer = 0;
 		this->numerator = numerator;
 		this->denominator = denominator ? denominator : 1;
-		cout << "Constructor:\t" << this << endl;
+		std::cout << "Constructor:\t" << this << std::endl;
 	}
 	Fraction(int integer, int numerator, int denominator)
 	{
@@ -73,11 +86,11 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		/*
 			condition ? expression1 : expression2;
 		*/
-		cout << "Constructor:\t" << this << endl;
+		std::cout << "Constructor:\t" << this << std::endl;
 	}
 	~Fraction()
 	{
-		cout << "Destructor:\t" << this << endl;
+		std::cout << "Destructor:\t" << this << std::endl;
 	}
 	Fraction(const Fraction& other)
 	{
@@ -85,16 +98,32 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		this->integer = other.integer;
 		this->numerator = other.numerator;
 		this->denominator = other.denominator;
-		cout << "CopyConstructor:\t" << this << endl;
+		std::cout << "CopyConstructor:\t" << this << std::endl;
 	}
-
+	Fraction& operator*=(Fraction& other)
+	{
+		this->to_improper();
+		other.to_improper();
+		this->numerator *= other.numerator;
+		this->denominator *= other.denominator;
+		return this->to_proper();
+	}
+	
 	//		Operators:
 	Fraction& operator=(const Fraction& other)
 	{
 		this->integer = other.integer;
 		this->numerator = other.numerator;
 		this->denominator = other.denominator;
-		cout << "CopyAssignment:" << this << endl;
+		std::cout << "CopyAssignment:" << this << std::endl;
+		return *this;
+	}
+
+	Fraction& operator=(int integer)
+	{
+		this->integer = integer;
+		this->numerator = 0;
+		this->denominator = 1;
 		return *this;
 	}
 
@@ -110,19 +139,43 @@ public://в открытой секции обь€вл€ютс€ get/set методы
 		return result;
 	}*/
 
+	//		Increment/Decrement (»нкримент и дикремент)
+	Fraction& operator++()
+	{
+		this->integer++;
+		return *this;
+	}
+
+	Fraction operator++(int) //postfix increment
+	{
+		Fraction buffer = *this;
+		this->integer++;
+		return buffer;
+	}
+	//		type-cast operators:
+	explicit operator int() const
+	{
+		return integer;
+	}
+	operator double() const
+	{
+		// »з простой дроби делаем дес€тичную
+		return integer + (double)numerator / denominator;
+	}
 
 	//		Methods:
-	void print()const
+	Fraction& print()
 	{
-		if (integer)cout << integer;
+		if (integer)std::cout << integer;
 		if (numerator)
 		{
-			if (integer)cout << "(";
-			cout << numerator << "/" << denominator;
-			if (integer)cout << ")";
+			if (integer)std::cout << "(";
+			std::cout << numerator << "/" << denominator;
+			if (integer)std::cout << ")";
 		}
-		else if (integer == 0)cout << 0;
-		cout << endl;
+		else if (integer == 0)std::cout << 0;
+		std::cout << std::endl;
+		return *this;
 	}
 
 	Fraction& to_improper()
@@ -194,16 +247,37 @@ Fraction operator-(Fraction left, Fraction right) //оператор вычетани€
 	return result.to_proper();
 }
 
+std::ostream& operator<<(std::ostream& os, const Fraction& obj)
+{
+	if (obj.get_integer())os << obj.get_integer();
+	if (obj.get_numerator())
+	{
+		if (obj.get_integer())os << "(";
+		os << obj.get_numerator() << "/" << obj.get_denominator();
+		if (obj.get_integer())os << ")";
+	}
+	if(obj.get_integer() == 0 && obj.get_numerator() == 0)os << 0;
+	return os;
+}
+
+std::istream& operator>>(std::istream& is, Fraction& obj)
+{
+	int integer, numerator, denominator;
+	is >> integer >> numerator >> denominator;
+	obj(integer, numerator, denominator);
+	return is;
+
+}
 
 void main()
 {
 	setlocale(LC_ALL, "");
-	cout << "**********************************************" << endl;
-	cout << "\t\t\tOOP_Fraction" << endl;
-	cout << "**********************************************" << endl;
+	std::cout << "**********************************************" << std::endl;
+	std::cout << "\t\t\tOOP_Fraction" << std::endl;
+	std::cout << "**********************************************" << std::endl;
 #ifdef CONSTRUCTIONS_CHECK
 	double a = 5;
-	cout << a << endl;
+	std::cout << a << std::endl;
 	Fraction A; //Default constructor;
 	A.print();
 	Fraction B(5); //Single argument constructor
@@ -221,7 +295,7 @@ void main()
 	Fraction F;
 	F = E;
 	F.print();
-#endif
+#endif // CONSTRUCTIONS_CHECK
 
 #ifdef OPERATORS_CHECK
 	Fraction A(2, 1, 2);
@@ -236,16 +310,48 @@ void main()
 	D.print();
 	E.print();
 	F.print();
-	cout << "---------------------" << endl;
+	std::cout << "---------------------" << std::endl;
 	C.reduce();
 	A.print();
 	B.print();
+	A *= B;
+	A.print();
 
 	double a = 2.5;
 	double b = 3.14;
 	double c = a * b;
-#endif
+#endif // OPERATORS_CHECK
 
+#ifdef INPUT_OUTPUT_CHECK
+	for (double i = 0.25; i < 10; i++)
+	{
+		std::cout << i << "\t";
+	} 
+	std::cout << "---------------------" << std::endl;
+	Fraction A(1, 4);
+	std::cout << A++ << std::endl;
+	std::cout << "¬ведите целую часть дроби, числитель и знаменатель через пробел: ";
+	std::cin >> A;
+	std::cout << "¬ы ввели: " << A << std::endl;
+#endif // INPUT_OUTPUT_CHECK
 
+#ifdef TYPE_CONVERSIONS
+	int a = 2;
+	double b = 3;
+	a = b;
+	std::cout << a << std::endl;
+	Fraction A = (Fraction)4; // single argument constructor
+	A = (Fraction)5; // operator=
+	std::cout << A << std::endl;
+
+	a = (int)A; // C-like cast notation
+	a = int(A); // Functional notation
+	std::cout << a << std::endl;
+	std::cout << "**********************************************" << std::endl;
+	A(2, 3, 10);
+	b = A;
+	std::cout << b << std::endl;
+	
+#endif // TYPE_CONVERSIONS
 
 }
